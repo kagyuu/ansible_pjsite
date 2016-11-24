@@ -1,0 +1,77 @@
+---
+- name: Install utilities for redmine
+  yum: name="{{ item }}" state=present
+  with_items:
+    - "ImageMagick"
+    - "ipa-pgothic-fonts"
+    - "graphviz"
+    - "git"
+    - "subversion"
+    - "darcs"
+    - "mercurial"
+    - "cvs"
+    - "bzr"
+
+- name: Check whether redmine was installed or not
+  stat: path={{ redmine_dir }}
+  register: redmine
+
+- name: Checkout Redmine
+  hg:
+    repo="https{{ COLON }}//bitbucket.org/redmine/redmine{{ MINUS }}all"
+    revision="3.3{{ MINUS }}stable"
+    dest="{{ redmine_dir }}"
+  when: not redmine.stat.exists
+
+- name: database.yml
+  template:
+    src=database.yml
+    dest={{ redmine_dir }}/config/database.yml
+    force=no
+  register:
+    result_database_yml
+
+- name: configuration.yml
+  template:
+    src=configuration.yml
+    dest={{ redmine_dir }}/config/configuration.yml
+    force=no
+
+# following data settings only would be executed on first run,
+# "result_database_yml | changed" is used as first-run-flag.
+- include: tasks/install.yml
+  when: result_database_yml | changed
+
+- name: create secret token
+  command:
+    bundle exec rake generate_secret_token
+    chdir={{ redmine_dir }}
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+    RAILS_ENV: production
+  when: result_database_yml | changed
+
+- name: import default data
+  command:
+    bundle exec rake redmine:load_default_data
+    chdir={{ redmine_dir }}
+  environment:
+    PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
+    RAILS_ENV: production
+    REDMINE_LANG: "{{ redmine_locale }}"
+  when: result_database_yml | changed
+
+- include: tasks/settings.yml
+  when: result_database_yml | changed
+
+- include: tasks/themes.yml
+- include: tasks/plugins.yml
+
+# This task must be last for building redmine.
+# We want to change whole files of redmine to apache:apache, so we must execute
+# this task all after patching yml setting files, installing all plugins and other settings.
+- name: Change owner of {{ redmine_dir }} apache:apache
+  file:
+    path={{ redmine_dir }} state=directory
+    owner=apache group=apache
+    recurse=yes

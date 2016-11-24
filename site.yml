@@ -1,0 +1,36 @@
+---
+- name: Gitlab Server
+  hosts: gitlab
+  become: yes
+  vars_files:
+    - proxy.yml
+  environment: "{{ proxy_env }}"
+  roles:
+    - ../ansible_common/common
+    - gitlab
+
+- name: Redmine Server
+  hosts: redmine
+  become: yes
+  vars_files:
+    - proxy.yml
+  environment: "{{ proxy_env }}"
+  roles:
+    - ../ansible_common/common
+    - ../ansible_common/ruby
+    - { role: ../ansible_common/postgres, db_name: redmine, db_passwd: "{{ db_passwd_redmine }}" }
+    - redmine
+    - passenger
+
+- name: Ldap Server
+  hosts: ldap
+  become: yes
+  vars_files:
+    - proxy.yml
+  environment: "{{ proxy_env }}"
+  roles:
+    - ../ansible_common/common
+    - ../ansible_common/ldap
+    - ../ansible_common/tomcat
+    - ../ansible_common/pwm
+    - ../ansible_common/ldapadmin
