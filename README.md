@@ -192,7 +192,7 @@ Details
       ```
 
       ```shell
-      $ ldapsearch -x -LLL -H ldap:/// -b cn=ichiro,ou=People,dc=example,dc=com dn memberof
+      $ ldapsearch -x -D "cn=Manager,dc=example,dc=com" -W -b "cn=ichiro,ou=People,dc=example,dc=com" memberof
       dn: cn=ichiro,ou=People,dc=example,dc=com
       memberOf: cn=admin,ou=Group,dc=example,dc=com
       ```
