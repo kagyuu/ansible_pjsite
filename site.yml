@@ -8,6 +8,7 @@
   roles:
     - ../ansible_common/common
     - gitlab
+    - { role: ../ansible_common/firewalld, SERVICES:["http"] }
 
 - name: Redmine Server
   hosts: redmine
@@ -21,6 +22,7 @@
     - { role: ../ansible_common/postgres, db_name: redmine, db_passwd: "{{ db_passwd_redmine }}" }
     - redmine
     - passenger
+    - { role: ../ansible_common/firewalld, SERVICES:["http"] }
 
 - name: Ldap Server
   hosts: ldap
@@ -34,3 +36,4 @@
     - ../ansible_common/tomcat
     - ../ansible_common/pwm
     - ../ansible_common/ldapadmin
+    - { role: ../ansible_common/firewalld, SERVICES:["http","ldap"] }
