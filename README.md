@@ -153,88 +153,18 @@ Details
 
 ### <a name="ldap">LDAP</a> ###
 
-- About Domain-name and password
-  - <span style="color:red">Change following variablie</span> in  /roles/ldap/vars/main.yml
-
-    ```yaml
-    ---
-    # DOMAIN must be the first dc of the SUFFIX.
-    ROOT_PWD: secret
-    DOMAIN: example
-    SUFFIX: dc=example,dc=com
-    ORG: production site
-    ```
-- Settings by ansible-playbook
-  - OpenLDAP 2.3 or higher is OLC(On-Line Configuration). So, we must write settings for OpenLDAP itself to following directory tree.
-    - cn=config
-       - dc=schema
-       - olcDatabase={0}config
-       - olcDatabase={2}bdb
-  - Schema : The playbook set following schema to cn=config,dc=schema
-    - core.schema   (required) : basic attribute. "cn", "ou", etc.
-    - cosine.schema (required) : x500/COSINE tree figure data structure
-    - inetorgperson.schema     : name, group, email, etc.
-    - memberof : memberof overlay. Make OpenLDAP add memberof attribute to the search result of person node like RDB's view-table. For example, if you create admin-gruop and admin-user ichiro, ichiro's memberOf attribute(s) is resolved by OpenLDAP automatically when ldapsearch was invoked.
-
-      ```
-      # admin user
-      dn: cn=ichiro,ou=People,dc=example,dc=com
-      objectClass: inetOrgPerson
-      cn: ichiro
-      sn: suzuki
-      userPassword: ichiro123
-
-      # admin group
-      dn: cn=admin,ou=Group,dc=example,dc=com
-      objectClass: groupOfNames
-      cn: admin
-      member: cn=ichiro,ou=People,dc=example,dc=com
-      ```
-
-      ```shell
-      $ ldapsearch -x -D "cn=Manager,dc=example,dc=com" -W -b "cn=ichiro,ou=People,dc=example,dc=com" memberof
-      dn: cn=ichiro,ou=People,dc=example,dc=com
-      memberOf: cn=admin,ou=Group,dc=example,dc=com
-      ```
-  - Data directory : The playbook create following tree
-    - dc=com
-      - dc=example
-        - Group (organizationalUnit)
-          - admin (groupOfNames)
-            - admin.member = cn=ichiro,ou=People,dc=example,dc=com
-        - People (organizationalUnit)
-          - ichiro (inetOrgPerson)
-              - ichiro.userPassword=ichiro123
-          - jiro (inetOrgPerson)
-            - jiro.userPassword=jiro123
-  - Access authentication : The playbook set following access auth settings to olcDatabase={2}bdb.
-
-| Attribute    | User        | Auth         |
-|:-------------|:------------|:------------:|
-| userPassword |cn=Manager,dc=example,dc=com|manage        |
-|              |self         |write         |
-|              |anonymous    |auth          |
-|              |* (other)    |none          |
-| * (other)    |cn=Manager,dc=example,dc=com|manage        |
-|              |self         |write         |
-|              |* (other)    |none          |
-
-Appendix. About typical attibutes of LDAP
-
-| Attribute    | Note        |
-|:-------------|:------------|
-|dn            |a location of tree. Ex. cn=ichiro,ou=People,dc=example,dc=com|
-|dc            |domain component. Ex. dc=example, dc=com|
-|c             |country|
-|o             |organization. Ex. a company|
-|ou            |organization unit. Ex. a division in the company|
-|cn            |lastname (family-name)|
-|sn            |firstname (given-name)|
-|uid           |user id|
-|userPassword  |password. You shoud store hash value of password. Don't put plain text.|
-|RDN           |primary key (attribute) in brother nodes|
+- call common role ldap
+- you can customize arguments
+| Argument     | Default value | Explanation |
+|:-------------|:--------------|:------------|
+|ROOT_PWD |secret ||
+|DOMAIN   |example|DOMAIN must be the first dc of the SUFFIX.|
+|SUFFIX   |dc=example,dc=com|base dn|
+|ORG      |example co. ltd.|Organization name.|
 
 ### <a name="pwm">PWM</a> ###
+
+- call common role pwm
 
 ### Jenkins ###
 

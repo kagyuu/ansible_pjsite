@@ -36,4 +36,5 @@
     - ../ansible_common/tomcat
     - ../ansible_common/pwm
     - ../ansible_common/ldapadmin
+    - { role: ../ansible_common/http_proxy, REQUEST:"/pwm/", DEST:"http://localhost:8080/pwm/"}
     - { role: ../ansible_common/firewalld, SERVICES:["http","ldap"] }
