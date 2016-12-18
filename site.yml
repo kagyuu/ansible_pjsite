@@ -8,7 +8,7 @@
   roles:
     - ../ansible_common/common
     - gitlab
-    - { role: ../ansible_common/firewalld, SERVICES:["http"] }
+    - { role: ../ansible_common/firewalld, SERVICES:["ssh","http","https"] }
 
 - name: Redmine Server
   hosts: redmine
