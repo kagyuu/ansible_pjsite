@@ -1,5 +1,14 @@
 ---
 ##########
+## Install DMSF
+## https://github.com/danmunn/redmine_dmsf
+- name: install DMSF plugin for redmine 3
+  git:
+    repo=https://github.com/danmunn/redmine_dmsf.git
+    dest={{ redmine_dir }}/plugins/redmine_dmsf
+    force=yes
+
+##########
 ## backlog
 - name: install backlogs plugin for redmine 3
   git:

@@ -4,7 +4,7 @@
 
 - name: install plugin gems
   command:
-    bundle install --no-deployment
+    bundle install --without xapian --no-deployment
     chdir={{ redmine_dir }}
   environment:
     PATH: "/usr/local/bin:{{ ansible_env.PATH }}"
