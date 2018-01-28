@@ -8,7 +8,7 @@
     - 'Setting["default_language"]="{{ redmine_locale }}"'
     - 'Setting["repositories_encodings"]="UTF-8,CP932,EUC-JP"'
     # Default Theme
-    - 'Setting["ui_theme"]="gitmike"'
+    - 'Setting["ui_theme"]="minimalflat2"'
     - 'Setting["thumbnails_enabled"]="1"'
     # REST API
     - 'Setting["rest_api_enabled"]="1"'

@@ -1,52 +1,5 @@
 ---
 ##########
-## Install DMSF
-## https://github.com/danmunn/redmine_dmsf
-- name: install DMSF plugin for redmine 3
-  git:
-    repo=https://github.com/danmunn/redmine_dmsf.git
-    dest={{ redmine_dir }}/plugins/redmine_dmsf
-    force=yes
-
-##########
-## backlog
-- name: install backlogs plugin for redmine 3
-  git:
-    repo=https://github.com/backlogs/redmine_backlogs.git
-    version=origin/feature/redmine3
-    dest={{ redmine_dir }}/plugins/redmine_backlogs
-    force=yes
-
-# To Create the patch file:
-# 1. login remote redmine server
-# 2. backup Gemfile to Gemfile.org
-# 3. change Gemfile
-# 4. exit redmine server to ansible host
-# 5. run remote diff command from ansible host
-#    $ vagrant ssh redmine -- sudo diff /var/lib/redmine/plugins/redmine_backlogs/Gemfile.org /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-- name: apply patch to /var/lib/redmine/plugins/redmine_backlogs/Gemfile
-  patch: >
-    src=backlogs_Gemfile.diff
-    dest=/var/lib/redmine/plugins/redmine_backlogs/Gemfile
-    backup=yes
-  ignore_errors: yes
-
-##########
-## knowledgebase !! NOT WORK
-#- name: install redmine_knowledgebase plugin
-#  git:
-#    repo=https://github.com/alexbevi/redmine_knowledgebase.git
-#    dest={{ redmine_dir }}/plugins/redmine_knowledgebase
-#    force=yes
-#
-#- name: apply patch to /var/lib/redmine/plugins/redmine_knowledgebase/Gemfile
-#  patch: >
-#    src=knowledgebase_Gemfile.diff
-#    dest=/var/lib/redmine/plugins/redmine_knowledgebase/Gemfile
-#    backup=yes
-#  ignore_errors: yes
-
-##########
 ## Non free plugins
 - name: install non free plugins
   unarchive:
@@ -60,13 +13,6 @@
     - redmine_zenedit-0_0_2-light.zip
   ignore_errors: yes
 
-- name: apply patch to easy_gantt.css
-  patch: >
-    src=easy_gantt.css.diff
-    dest=/var/lib/redmine/plugins/easy_gantt/assets/stylesheets/easy_gantt.css
-    backup=yes
-  ignore_errors: yes
-
 - name: add star icon
   copy: src=star.png dest=/var/lib/redmine/public/images/star.png mode=0644
 
@@ -76,39 +22,32 @@
     insertafter=".icon-list"
     line=".icon-star { background-image{{ COLON }} url(../images/star.png); }"
 
-###########
-### xls export
-- name: install redmine_xls_export plugin
-  git:
-    repo=https://github.com/two-pack/redmine_xls_export.git
-    dest={{ redmine_dir }}/plugins/redmine_xls_export
-    force=yes
-
-- name: apply patch to /var/lib/redmine/plugins/redmine_xls_export/Gemfile
-  patch: >
-    src=xls_export_Gemfile.diff
-    dest=/var/lib/redmine/plugins/redmine_xls_export/Gemfile
-    backup=yes
-  ignore_errors: yes
-
 ##########
 ## Other plugins
-- name: install plugins in bitbucket
-  hg:
-    repo=https://bitbucket.org/{{ item.author }}/{{ item.plugin }}
-    dest={{ redmine_dir }}/plugins/{{ item.plugin }}
-  with_items:
-    - { author: "haru_iida"   , plugin: "redmine_theme_changer"}
-    - { author: "haru_iida"   , plugin: "redmine_wiki_extensions"}
+
+#- name: install plugins in bitbucket
+#  hg:
+#    repo=https://bitbucket.org/{{ item.author }}/{{ item.plugin }}
+#    dest={{ redmine_dir }}/plugins/{{ item.plugin }}
+#  with_items:
+#    - { author: "haru_iida"   , plugin: "redmine_theme_changer"}
+#    - { author: "haru_iida"   , plugin: "redmine_wiki_extensions"}
 
 - name: install plugins in github
   git:
     repo=https://github.com/{{ item.author }}/{{ item.plugin }}.git
     dest={{ redmine_dir }}/plugins/{{ item.destdir | default(item.plugin) }}
+    version={{ item.version | default('master') }}
+    force=yes
   with_items:
     # Ticket
     - { author: "akiko-pusu"  , plugin: "redmine_issue_templates"}
     - { author: "hidakatsuya" , plugin: "redmine_default_custom_query"}
+    - { author: "Loriowar"    , plugin: "redmine_issues_tree", version: "3.4.x"}
+    - { author: "two-pack"    , plugin: "redmine_xlsx_format_issue_exporter"}
+    - { author: "matsukei"    , plugin: "redmine_serial_number_field"}
+    # SCM
+    - { author: "danmunn"     , plugin: "redmine_dmsf"}
     # Wiki
     - { author: "paginagmbh"  , plugin: "redmine_lightbox2"}
     - { author: "peclik"      , plugin: "clipboard_image_paste"}
@@ -120,5 +59,14 @@
     - { author: "akiko-pusu"  , plugin: "redmine_banner"}
     # looks good but not work
     # - { author: "onozaty"     , plugin: "redmine-view-customize", destdir: "view-customize"}
+    # - { author: "alexbevi"   , plugin: "redmine_knowledgebase"}
+
+# resolve conflicts of gems
+- name: resolve conflicts of gem versions
+  replace:
+    dest=/var/lib/redmine/plugins/redmine_dmsf/Gemfile
+    regexp='rubyzip'.*
+    replace=''rubyzip''
+    backup=yes
 
 - include: tasks/install.yml

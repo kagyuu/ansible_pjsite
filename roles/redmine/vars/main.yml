@@ -1,3 +1,4 @@
 ---
 redmine_dir : /var/lib/redmine
 redmine_locale : ja
+redmine_version : 3.4

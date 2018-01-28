@@ -19,7 +19,7 @@
 - name: Checkout Redmine
   hg:
     repo="https{{ COLON }}//bitbucket.org/redmine/redmine{{ MINUS }}all"
-    revision="3.3{{ MINUS }}stable"
+    revision="{{ redmine_version }}{{ MINUS }}stable"
     dest="{{ redmine_dir }}"
   when: not redmine.stat.exists
 
