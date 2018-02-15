@@ -22,7 +22,8 @@
     - { role: ../ansible_common/postgres, db_name: redmine, db_passwd: "{{ db_passwd_redmine }}" }
     - redmine
     - passenger
-    - { role: ../ansible_common/firewalld, SERVICES:["http"] }
+    - jenkins
+    - { role: ../ansible_common/firewalld, SERVICES:["http"], PORTS:["8080/tcp"] }
 
 - name: Ldap Server
   hosts: ldap
