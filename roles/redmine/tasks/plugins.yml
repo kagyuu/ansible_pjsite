@@ -46,7 +46,7 @@
     - { author: "Loriowar"    , plugin: "redmine_issues_tree", version: "3.4.x"}
     - { author: "two-pack"    , plugin: "redmine_xlsx_format_issue_exporter"}
     - { author: "matsukei"    , plugin: "redmine_serial_number_field"}
-    # SCM
+    # CMS
     - { author: "danmunn"     , plugin: "redmine_dmsf"}
     # Wiki
     - { author: "paginagmbh"  , plugin: "redmine_lightbox2"}
