@@ -69,4 +69,4 @@
     replace=''rubyzip''
     backup=yes
 
-- include: tasks/install.yml
+- import_tasks: tasks/install.yml

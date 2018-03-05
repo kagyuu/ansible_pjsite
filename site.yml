@@ -1,18 +1,7 @@
 ---
-- name: Gitlab Server
-  hosts: gitlab
-  become: yes
-  vars_files:
-    - proxy.yml
-  environment: "{{ proxy_env }}"
-  roles:
-    - ../ansible_common/common
-    - gitlab
-    - { role: ../ansible_common/firewalld, SERVICES:["ssh","http","https"] }
-
 - name: Redmine Server
   hosts: redmine
-  become: yes
+  become: true
   vars_files:
     - proxy.yml
   environment: "{{ proxy_env }}"
@@ -24,18 +13,3 @@
     - passenger
     - jenkins
     - { role: ../ansible_common/firewalld, SERVICES:["http"], PORTS:["8080/tcp"] }
-
-- name: Ldap Server
-  hosts: ldap
-  become: yes
-  vars_files:
-    - proxy.yml
-  environment: "{{ proxy_env }}"
-  roles:
-    - ../ansible_common/common
-    - ../ansible_common/ldap
-    - ../ansible_common/tomcat
-    - ../ansible_common/pwm
-    - ../ansible_common/ldapadmin
-    - { role: "../ansible_common/http_proxy", REQUEST: "/pwm/", DEST: "http://localhost:8080/pwm/" }
-    - { role: ../ansible_common/firewalld, SERVICES:["http","ldap"] }

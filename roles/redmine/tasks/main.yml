@@ -39,7 +39,7 @@
 
 # following data settings only would be executed on first run,
 # "result_database_yml | changed" is used as first-run-flag.
-- include: tasks/install.yml
+- import_tasks: tasks/install.yml
   when: result_database_yml | changed
 
 - name: create secret token
@@ -61,11 +61,11 @@
     REDMINE_LANG: "{{ redmine_locale }}"
   when: result_database_yml | changed
 
-- include: tasks/settings.yml
+- import_tasks: tasks/settings.yml
   when: result_database_yml | changed
 
-- include: tasks/themes.yml
-- include: tasks/plugins.yml
+- import_tasks: tasks/themes.yml
+- import_tasks: tasks/plugins.yml
 
 # This task must be last for building redmine.
 # We want to change whole files of redmine to apache:apache, so we must execute
